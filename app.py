@@ -22,7 +22,11 @@ def load_models():
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     bert_tokenizer = AutoTokenizer.from_pretrained(MODEL_REPO)
-    bert_model = AutoModelForSequenceClassification.from_pretrained(MODEL_REPO).to(device)
+    bert_model = AutoModelForSequenceClassification.from_pretrained(
+        MODEL_REPO,
+        low_cpu_mem_usage=True,
+        torch_dtype=torch.float32
+    ).to(device)
     bert_model.eval()
 
     symptom_vectorizer = joblib.load("symptom_vectorizer.pkl")
