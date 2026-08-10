@@ -4,7 +4,6 @@ import joblib
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from lime.lime_text import LimeTextExplainer
 
-# ===================== PAGE CONFIG =====================
 st.set_page_config(page_title="ExplainASD", page_icon="🧩", layout="centered")
 
 st.title("🧩 ExplainASD")
@@ -16,13 +15,14 @@ st.warning(
     "a child's development, please consult a qualified healthcare provider."
 )
 
-# ===================== LOAD MODELS (cached so it only loads once) =====================
+MODEL_REPO = "Sameenatasleem/explainasd-bert"
+
 @st.cache_resource
 def load_models():
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    bert_tokenizer = AutoTokenizer.from_pretrained("bert_asd_model")
-    bert_model = AutoModelForSequenceClassification.from_pretrained("bert_asd_model").to(device)
+    bert_tokenizer = AutoTokenizer.from_pretrained(MODEL_REPO)
+    bert_model = AutoModelForSequenceClassification.from_pretrained(MODEL_REPO).to(device)
     bert_model.eval()
 
     symptom_vectorizer = joblib.load("symptom_vectorizer.pkl")
@@ -54,7 +54,6 @@ def predict_symptom(text):
     return symptom_label_encoder.inverse_transform([pred])[0]
 
 
-# ===================== USER INPUT =====================
 st.subheader("Enter a behavioral description")
 user_text = st.text_area(
     "Example: \"He does not respond when I call his name and avoids eye contact.\"",
@@ -63,7 +62,6 @@ user_text = st.text_area(
 
 analyze_clicked = st.button("🔍 Analyze", type="primary")
 
-# ===================== RUN ANALYSIS =====================
 if analyze_clicked:
     if not user_text.strip():
         st.error("Please enter a sentence to analyze.")
